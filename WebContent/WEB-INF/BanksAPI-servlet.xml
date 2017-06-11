@@ -1,0 +1,40 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!--  Scanning the Spring Beans -->
+	<context:component-scan base-package="com.el"/>
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+      <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+      <property name="url" value="jdbc:mysql://localhost:3306/test"/>
+      <property name="username" value="vicky"/>
+      <property name="password" value="vicky"/>
+    </bean>
+    	
+	<bean id="jedisConnFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
+			p:use-pool="true" />
+
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate"
+			p:connection-factory-ref="jedisConnFactory" />
+    
+    <bean id="bankAPIDAOImpl" class="com.el.DAO.BankAPIDAOImpl">
+      <property name="dataSource" ref="dataSource"/>
+      <property name="redisTemplate" ref="redisTemplate" />
+    </bean>
+    
+     <bean id="messageSubscribers" class="com.el.MessageSubscribers.MessageSubscribers">
+      <property name="redisTemplate" ref="redisTemplate" />
+    </bean>
+    
+    <bean id="bankAPIServiceImpl" class="com.el.Service.BankAPIServiceImpl" />
+    
+    <bean id="jdbcTemplateObject" class="org.springframework.jdbc.core.JdbcTemplate"> 
+      <property name="dataSource" ref="dataSource"/> 
+    </bean>
+	
+</beans>
